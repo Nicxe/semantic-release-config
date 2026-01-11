@@ -1,0 +1,26 @@
+## **{{projectName}} – v{{version}}**
+
+{{#if repoSlug}}
+![GitHub Downloads (all assets, specific tag)](https://img.shields.io/github/downloads/{{repoSlug}}/v{{version}}/total)
+{{/if}}
+
+{{#if prerelease}}
+⚠️ This is a **beta release** intended for testing.
+{{/if}}
+
+{{#each commitGroups}}
+### {{title}}
+{{#each commits}}
+- {{subject}}
+{{#if bodyIndented}}
+{{bodyIndented}}
+{{/if}}
+{{/each}}
+{{/each}}
+
+{{!-- Optional support section (only if you add fields in finalizeContext later) --}}
+{{#if supportText}}
+### ⭐ Support `{{projectName}}`
+
+{{supportText}}
+{{/if}}

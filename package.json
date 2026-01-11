@@ -1,0 +1,32 @@
+{
+  "name": "@nicxe/semantic-release-config",
+  "version": "0.0.0-development",
+  "description": "Shared semantic-release configuration for Nicxe repos",
+  "license": "MIT",
+  "main": "index.js",
+  "files": [
+    "index.js",
+    ".release/"
+  ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "private": false,
+  "devDependencies": {
+    "@semantic-release/commit-analyzer": "^12.0.0",
+    "@semantic-release/exec": "^6.0.3",
+    "@semantic-release/github": "^10.3.5",
+    "@semantic-release/npm": "^12.0.1",
+    "@semantic-release/release-notes-generator": "^13.0.0",
+    "conventional-changelog-conventionalcommits": "^8.0.0",
+    "semantic-release": "^23.1.1"
+  },
+  "peerDependencies": {
+    "@semantic-release/commit-analyzer": "^12.0.0",
+    "@semantic-release/exec": "^6.0.3",
+    "@semantic-release/github": "^10.3.5",
+    "@semantic-release/release-notes-generator": "^13.0.0",
+    "conventional-changelog-conventionalcommits": "^8.0.0",
+    "semantic-release": "^23.1.1"
+  }
+}
