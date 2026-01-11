@@ -57,8 +57,9 @@ function quoteSh(value) {
  * Create a semantic-release config shared across repos.
  *
  * @param {object} options
- * @param {string} options.componentDir - e.g. "custom_components/met_rain_risk"
- * @param {string} options.manifestPath - e.g. "custom_components/met_rain_risk/manifest.json"
+ * @param {"integration"|"assets"} [options.kind] - "integration" (zip+manifest) or "assets" (cards)
+ * @param {string} [options.componentDir] - e.g. "custom_components/met_rain_risk" (integration)
+ * @param {string} [options.manifestPath] - e.g. "custom_components/met_rain_risk/manifest.json" (integration)
  * @param {string} [options.zipName] - defaults to "<component>.zip"
  * @param {string} [options.zipPath] - defaults to "custom_components/<zipName>"
  * @param {Array<{path:string,label?:string,name?:string}>} [options.assets] - GitHub release assets
@@ -66,9 +67,11 @@ function quoteSh(value) {
  * @param {string} [options.repoSlug] - "owner/repo" used by the shared release-notes template
  * @param {string} [options.templatePath] - path to a repo-local template to use instead
  * @param {boolean} [options.draftRelease=true] - create draft GitHub releases
+ * @param {boolean} [options.notifyIssues=true] - run shared notify-issues script on success
  */
 module.exports = function createSemanticReleaseConfig(options = {}) {
   const {
+    kind,
     componentDir,
     manifestPath,
     zipName,
@@ -77,24 +80,43 @@ module.exports = function createSemanticReleaseConfig(options = {}) {
     projectName,
     repoSlug,
     templatePath,
-    draftRelease = true
+    draftRelease = true,
+    notifyIssues = true
   } = options;
 
-  if (!componentDir) {
-    throw new Error(
-      "[semantic-release-config] Missing required option: componentDir"
-    );
+  const inferredKind =
+    kind || (componentDir && manifestPath ? "integration" : "assets");
+
+  if (inferredKind === "integration") {
+    if (!componentDir) {
+      throw new Error(
+        "[semantic-release-config] Missing required option: componentDir (integration)"
+      );
+    }
+    if (!manifestPath) {
+      throw new Error(
+        "[semantic-release-config] Missing required option: manifestPath (integration)"
+      );
+    }
   }
-  if (!manifestPath) {
+
+  if (inferredKind === "assets" && (!assets || assets.length === 0)) {
     throw new Error(
-      "[semantic-release-config] Missing required option: manifestPath"
+      "[semantic-release-config] Missing required option: assets (assets/card repos)"
     );
   }
 
-  const componentName = path.posix.basename(componentDir);
+  const componentName =
+    (componentDir && path.posix.basename(componentDir)) ||
+    (repoSlug ? String(repoSlug).split("/").pop() : "") ||
+    "release";
+
   const resolvedZipName = zipName || `${componentName}.zip`;
-  const resolvedZipPath =
-    zipPath || path.posix.join(path.posix.dirname(componentDir), resolvedZipName);
+  const resolvedZipPath = zipPath
+    ? zipPath
+    : componentDir
+      ? path.posix.join(path.posix.dirname(componentDir), resolvedZipName)
+      : resolvedZipName;
 
   const mainTemplate = readTemplate({ templatePath });
 
@@ -116,33 +138,41 @@ module.exports = function createSemanticReleaseConfig(options = {}) {
     .map((g) => quoteSh(g))
     .join(" ");
 
-  const prepareCmd = [
-    `node ${quoteSh(updateManifestScript)} --file ${quoteSh(
-      manifestPath
-    )} --version ${quoteSh("${nextRelease.version}")}`,
-    `&& (cd ${quoteSh(componentDir)} && rm -f ${quoteSh(
-      "../" + resolvedZipName
-    )} && zip -r ${quoteSh("../" + resolvedZipName)} . -x ${excludes})`
-  ].join(" ");
+  const execPluginConfig = {};
 
-  const successCmd = `node ${quoteSh(
-    notifyIssuesScript
-  )} --range ${quoteSh(
-    "${lastRelease.gitHead}..${nextRelease.gitHead}"
-  )} --version ${quoteSh(
-    "${nextRelease.version}"
-  )} --git-tag ${quoteSh("${nextRelease.gitTag}")} --channel ${quoteSh(
-    "${nextRelease.channel}"
-  )}`;
+  if (inferredKind === "integration") {
+    execPluginConfig.prepareCmd = [
+      `node ${quoteSh(updateManifestScript)} --file ${quoteSh(
+        manifestPath
+      )} --version ${quoteSh("${nextRelease.version}")}`,
+      `&& (cd ${quoteSh(componentDir)} && rm -f ${quoteSh(
+        "../" + resolvedZipName
+      )} && zip -r ${quoteSh("../" + resolvedZipName)} . -x ${excludes})`
+    ].join(" ");
+  }
+
+  if (notifyIssues) {
+    execPluginConfig.successCmd = `node ${quoteSh(
+      notifyIssuesScript
+    )} --range ${quoteSh(
+      "${lastRelease.gitHead}..${nextRelease.gitHead}"
+    )} --version ${quoteSh(
+      "${nextRelease.version}"
+    )} --git-tag ${quoteSh("${nextRelease.gitTag}")} --channel ${quoteSh(
+      "${nextRelease.channel}"
+    )}`;
+  }
 
   const githubAssets =
     assets ||
-    [
-      {
-        path: resolvedZipPath,
-        label: resolvedZipName
-      }
-    ];
+    (inferredKind === "integration"
+      ? [
+          {
+            path: resolvedZipPath,
+            label: resolvedZipName
+          }
+        ]
+      : []);
 
   return {
     tagFormat: "v${version}",
@@ -240,13 +270,9 @@ module.exports = function createSemanticReleaseConfig(options = {}) {
           }
         }
       ],
-      [
-        "@semantic-release/exec",
-        {
-          prepareCmd,
-          successCmd
-        }
-      ],
+      ...(Object.keys(execPluginConfig).length > 0
+        ? [["@semantic-release/exec", execPluginConfig]]
+        : []),
       [
         "@semantic-release/github",
         {
