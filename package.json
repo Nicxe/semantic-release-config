@@ -19,7 +19,7 @@
     "@semantic-release/npm": "^12.0.1",
     "@semantic-release/release-notes-generator": "^13.0.0",
     "conventional-changelog-conventionalcommits": "^8.0.0",
-    "semantic-release": "^23.1.1"
+    "semantic-release": "^24.1.0"
   },
   "peerDependencies": {
     "@semantic-release/commit-analyzer": ">=12 <14",
@@ -27,6 +27,6 @@
     "@semantic-release/github": ">=10 <13",
     "@semantic-release/release-notes-generator": ">=13 <15",
     "conventional-changelog-conventionalcommits": ">=8 <10",
-    "semantic-release": ">=23 <26"
+    "semantic-release": ">=24 <26"
   }
 }
