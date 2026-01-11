@@ -14,7 +14,29 @@ module.exports = {
     [
       "@semantic-release/release-notes-generator",
       {
-        preset: "conventionalcommits"
+        preset: "conventionalcommits",
+        writerOpts: {
+          // Work around "RangeError: Invalid time value" from conventional-changelog-writer
+          // when a commit has a missing/invalid committer date in some CI environments.
+          transform: (commit) => {
+            const transformed = { ...commit };
+
+            const rawDate =
+              transformed.committerDate ||
+              transformed.authorDate ||
+              commit.committerDate ||
+              commit.authorDate ||
+              commit.commit?.committer?.date ||
+              commit.commit?.author?.date;
+
+            const date = new Date(rawDate);
+            transformed.committerDate = Number.isNaN(date.getTime())
+              ? new Date().toISOString()
+              : date.toISOString();
+
+            return transformed;
+          }
+        }
       }
     ],
     [
