@@ -52,7 +52,7 @@ module.exports = {
         // Disable automated PR/issue comments from semantic-release
         successCommentCondition: "<% return false %>",
         failComment: false,
-        draftRelease: true
+        draftRelease: false
       }
     ]
   ]
