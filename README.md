@@ -20,7 +20,7 @@ module.exports = {
 
 ## What's included
 
-This configuration includes:
+This configuration includes
 
 - **@semantic-release/commit-analyzer** - Analyzes commits to determine version bump
 - **@semantic-release/release-notes-generator** - Generates release notes
