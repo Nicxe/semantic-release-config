@@ -4,6 +4,7 @@ const path = require("path");
 const DEFAULT_SECTION_ORDER = [
   "New features",
   "Bug fixes",
+  "Blueprints",
   "Documentation",
   "Maintenance",
   "Other changes"
@@ -12,6 +13,7 @@ const DEFAULT_SECTION_ORDER = [
 const DEFAULT_RELEASE_NOTE_TYPES = [
   { type: "feat", section: "New features" },
   { type: "fix", section: "Bug fixes" },
+  { type: "blue", section: "Blueprints" },
   { type: "docs", section: "Documentation" },
   // Keep `refactor` under Maintenance to avoid extra category headings.
   { type: "refactor", section: "Maintenance" },
@@ -285,4 +287,3 @@ module.exports = function createSemanticReleaseConfig(options = {}) {
     ]
   };
 };
-
