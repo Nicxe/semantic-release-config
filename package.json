@@ -14,7 +14,7 @@
   },
   "private": false,
   "devDependencies": {
-    "@semantic-release/commit-analyzer": "^12.0.0",
+    "@semantic-release/commit-analyzer": "^13.0.1",
     "@semantic-release/exec": "^7.1.0",
     "@semantic-release/github": "^12.0.2",
     "@semantic-release/npm": "^13.1.3",
