@@ -14,7 +14,7 @@
   },
   "private": false,
   "devDependencies": {
-    "@semantic-release/commit-analyzer": "^12.0.0",
+    "@semantic-release/commit-analyzer": "^13.0.0",
     "@semantic-release/exec": "^7.1.0",
     "@semantic-release/github": "^12.0.2",
     "@semantic-release/npm": "^13.1.3",
@@ -23,7 +23,7 @@
     "semantic-release": "^25.0.2"
   },
   "peerDependencies": {
-    "@semantic-release/commit-analyzer": ">=12 <14",
+    "@semantic-release/commit-analyzer": ">=12 <15",
     "@semantic-release/exec": ">=6 <8",
     "@semantic-release/github": ">=10 <13",
     "@semantic-release/release-notes-generator": ">=13 <15",
@@ -35,6 +35,7 @@
     "undici": ">=7.24.0",
     "npm": ">=11.10.1",
     "cross-spawn": "^7.0.6",
-    "brace-expansion": "^2.0.2"
+    "brace-expansion": "^2.0.2",
+    "picomatch": ">=4.0.4"
   }
 }
