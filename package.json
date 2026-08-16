@@ -17,10 +17,10 @@
     "@semantic-release/commit-analyzer": "^13.0.0",
     "@semantic-release/exec": "^7.1.0",
     "@semantic-release/github": "^12.0.2",
-    "@semantic-release/npm": "^13.1.3",
+    "@semantic-release/npm": "^13.1.5",
     "@semantic-release/release-notes-generator": "^14.1.0",
     "conventional-changelog-conventionalcommits": "^9.3.1",
-    "semantic-release": "^25.0.2"
+    "semantic-release": "^25.0.9"
   },
   "peerDependencies": {
     "@semantic-release/commit-analyzer": ">=12 <15",
@@ -31,11 +31,12 @@
     "semantic-release": ">=24 <26"
   },
   "overrides": {
-    "tar": "^7.5.11",
-    "undici": ">=7.24.0",
+    "tar": "^7.5.22",
+    "undici": ">=7.29.0",
     "npm": ">=11.18.0",
     "cross-spawn": "^7.0.6",
-    "brace-expansion": "^2.0.2",
-    "picomatch": ">=4.0.4"
+    "brace-expansion": "^2.1.4",
+    "picomatch": ">=4.0.4",
+    "ip-address": "^10.3.1"
   }
 }
