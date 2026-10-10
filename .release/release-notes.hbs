@@ -8,6 +8,10 @@
 ⚠️ This is a **beta release** intended for testing.
 {{/if}}
 
+{{#if repoSlug}}
+> ⭐ Enjoying **{{projectName}}**? [Star the project](https://github.com/{{repoSlug}}) to help others find it. A [one-time or monthly GitHub sponsorship](https://github.com/sponsors/Nicxe) is the best way to support its continued development. Prefer a quick thank-you? [Buy me a coffee](https://buymeacoffee.com/niklasv).
+
+{{/if}}
 {{#each commitGroups}}
 ### {{title}}
 
@@ -18,11 +22,4 @@
 {{/if}}
 {{/each}}
 {{/each}}
-
-
-### ☕ Support This Project
-
-If you find **{{projectName}}** useful, consider supporting its development
-
-[![Buy Me A Coffee](https://img.shields.io/badge/Buy_Me_a_Coffee-fdd734?&logo=buy-me-a-coffee&logoColor=black&style=for-the-badge)](https://www.buymeacoffee.com/NiklasV) [![GitHub Sponsors](https://img.shields.io/badge/GitHub_Sponsors-30363d?style=for-the-badge&logo=github&logoColor=white)](https://github.com/sponsors/Nicxe)
 
