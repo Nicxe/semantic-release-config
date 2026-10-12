@@ -1,0 +1,79 @@
+const assert = require("node:assert/strict");
+const test = require("node:test");
+
+async function generateNotes(commits) {
+  const config = require("../index.js")({
+    kind: "assets",
+    assets: [{ path: "card.js" }],
+    projectName: "F1 Sensor",
+    repoSlug: "Nicxe/f1_sensor",
+    notifyIssues: false
+  });
+  const [, options] = config.plugins.find(
+    ([name]) => name === "@semantic-release/release-notes-generator"
+  );
+  const { generateNotes: render } = await import(
+    "@semantic-release/release-notes-generator"
+  );
+  return render(options, {
+    cwd: process.cwd(),
+    env: process.env,
+    logger: console,
+    options: { repositoryUrl: "https://github.com/Nicxe/f1_sensor.git" },
+    commits,
+    lastRelease: { gitTag: "v1.0.0", version: "1.0.0" },
+    nextRelease: {
+      gitTag: "v1.1.0-beta.1",
+      version: "1.1.0-beta.1",
+      channel: "beta"
+    }
+  });
+}
+
+test("renders user-facing release notes without internal commit noise", async () => {
+  const notes = await generateNotes([
+    { hash: "1", message: "feat(card): Add timing comparison" },
+    {
+      hash: "2",
+      message:
+        "fix(integration): Restore delayed race timing\n\nKeeps live timing connected through the finish.\nFixes #772."
+    },
+    {
+      hash: "3",
+      message: "chore(translations): Improve Swedish live data card labels"
+    },
+    {
+      hash: "4",
+      message: "chore(accessibility): Improve keyboard navigation"
+    },
+    { hash: "5", message: "chore: Update release tooling" },
+    { hash: "6", message: "test: Cover release-note generation" },
+    { hash: "7", message: "fix(card): **Keep replay details visible**" },
+    {
+      hash: "8",
+      message: "chore(translations): Improve Swedish live data card labels"
+    }
+  ]);
+
+  assert.match(
+    notes,
+    /github\/downloads\/Nicxe\/f1_sensor\/v1\.1\.0-beta\.1\/total/
+  );
+  assert.match(notes, /This is a \*\*beta release\*\*/);
+  assert.match(notes, /GitHub Sponsors/);
+  assert.match(notes, /Optional editorial summary/);
+  assert.match(notes, /### New features/);
+  assert.match(notes, /### Bug fixes/);
+  assert.match(notes, /### Improvements/);
+  assert.match(notes, /### Translations/);
+  assert.match(notes, /### Support F1 Sensor/);
+  assert.match(notes, /\*\*Keep replay details visible\*\*/);
+  assert.match(notes, /Fixes #772/);
+  assert.doesNotMatch(notes, /\*\*\*\*Keep replay details visible\*\*\*\*/);
+  assert.doesNotMatch(notes, /Update release tooling/);
+  assert.doesNotMatch(notes, /Cover release-note generation/);
+  assert.equal(
+    (notes.match(/Improve Swedish live data card labels/g) || []).length,
+    1
+  );
+});

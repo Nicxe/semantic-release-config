@@ -4,6 +4,9 @@
   "description": "Shared semantic-release configuration for Nicxe repos",
   "license": "MIT",
   "main": "index.js",
+  "scripts": {
+    "test": "node --test"
+  },
   "files": [
     "index.js",
     ".release/"

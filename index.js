@@ -4,22 +4,42 @@ const path = require("path");
 const DEFAULT_SECTION_ORDER = [
   "New features",
   "Bug fixes",
+  "Improvements",
+  "Translations",
   "Blueprints",
   "Documentation",
-  "Maintenance",
-  "Other changes"
 ];
 
 const DEFAULT_RELEASE_NOTE_TYPES = [
   { type: "feat", section: "New features" },
   { type: "fix", section: "Bug fixes" },
+  { type: "perf", section: "Improvements" },
   { type: "blue", section: "Blueprints" },
   { type: "docs", section: "Documentation" },
-  // Keep `refactor` under Maintenance to avoid extra category headings.
-  { type: "refactor", section: "Maintenance" },
-  { type: "chore", section: "Maintenance" },
-  { type: "*", section: "Other changes" }
 ];
+
+const USER_FACING_CHORE_SCOPES = new Map([
+  ["accessibility", "Improvements"],
+  ["a11y", "Improvements"],
+  ["compatibility", "Improvements"],
+  ["i18n", "Translations"],
+  ["translations", "Translations"]
+]);
+
+function normalizedSubject(subject) {
+  const trimmed = String(subject || "").trim();
+  const boldMatch = trimmed.match(/^\*\*(.+)\*\*$/s);
+  return (boldMatch ? boldMatch[1] : trimmed).trim();
+}
+
+function sectionForCommit(type, scope) {
+  const normalizedType = String(type || "").toLowerCase();
+  if (normalizedType === "chore") {
+    return USER_FACING_CHORE_SCOPES.get(String(scope || "").toLowerCase());
+  }
+  return DEFAULT_RELEASE_NOTE_TYPES.find((entry) => entry.type === normalizedType)
+    ?.section;
+}
 
 function buildSectionOrderIndex(sectionOrder) {
   return sectionOrder.reduce((acc, title, idx) => {
@@ -124,13 +144,7 @@ module.exports = function createSemanticReleaseConfig(options = {}) {
 
   const sectionOrder = DEFAULT_SECTION_ORDER;
   const sectionOrderIndex = buildSectionOrderIndex(sectionOrder);
-  const typeToSection = DEFAULT_RELEASE_NOTE_TYPES.reduce(
-    (acc, { type, section }) => {
-      acc[type] = section;
-      return acc;
-    },
-    {}
-  );
+  const seenUserFacingChanges = new Set();
 
   const pkgReleaseDir = path.join(__dirname, ".release");
   const updateManifestScript = path.join(pkgReleaseDir, "update-manifest-version.js");
@@ -227,26 +241,33 @@ module.exports = function createSemanticReleaseConfig(options = {}) {
               }
 
               const transformed = { ...commit };
-
-              transformed.subject =
-                transformed.subject || commit.subject || commit.header || "";
-              if (!transformed.subject.trim()) {
+              const subject = normalizedSubject(
+                transformed.subject || commit.subject || commit.header
+              );
+              if (!subject) {
                 return null;
               }
 
-              // Keep docs/chore visible.
-              transformed.hidden = false;
-
-              // Map conventional type -> pretty section title (commitGroups[].title)
-              let rawType = transformed.type || commit.type;
-              if (typeof rawType !== "string" || !rawType.trim()) {
-                rawType = "*";
+              const rawType = String(transformed.type || commit.type || "")
+                .trim()
+                .toLowerCase();
+              const section = sectionForCommit(rawType, transformed.scope || commit.scope);
+              if (!section) {
+                return null;
               }
-              rawType = rawType === "*" ? "*" : rawType.toLowerCase();
-              transformed.type = typeToSection[rawType] || typeToSection["*"];
 
-              // Pre-indent body for markdown list continuation
               const body = (transformed.body || commit.body || "").trim();
+              const dedupeKey = [rawType, transformed.scope || commit.scope || "", subject, body]
+                .join("\u0000");
+              if (seenUserFacingChanges.has(dedupeKey)) {
+                return null;
+              }
+              seenUserFacingChanges.add(dedupeKey);
+
+              transformed.subject = subject;
+              transformed.type = section;
+
+              // Keep a concise user-facing commit body as a list continuation.
               if (body) {
                 transformed.bodyIndented = body
                   .split(/\r?\n/)
