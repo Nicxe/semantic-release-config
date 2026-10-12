@@ -36,7 +36,7 @@ test("renders user-facing release notes without internal commit noise", async ()
     {
       hash: "2",
       message:
-        "fix(integration): Restore delayed race timing\n\nKeeps live timing connected through the finish.\nFixes #772."
+        "fix(integration): Restore delayed race timing\n\nKeeps live timing connected through the finish.\n\nFixes #772."
     },
     {
       hash: "3",
@@ -68,7 +68,7 @@ test("renders user-facing release notes without internal commit noise", async ()
   assert.match(notes, /### Translations/);
   assert.match(notes, /### Support F1 Sensor/);
   assert.match(notes, /\*\*Keep replay details visible\*\*/);
-  assert.match(notes, /Fixes #772/);
+  assert.match(notes, /Keeps live timing connected through the finish\.\n  \n  Fixes #772\./);
   assert.doesNotMatch(notes, /\*\*\*\*Keep replay details visible\*\*\*\*/);
   assert.doesNotMatch(notes, /Update release tooling/);
   assert.doesNotMatch(notes, /Cover release-note generation/);

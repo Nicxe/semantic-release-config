@@ -257,7 +257,13 @@ module.exports = function createSemanticReleaseConfig(options = {}) {
               }
 
               const body = (transformed.body || commit.body || "").trim();
-              const dedupeKey = [rawType, transformed.scope || commit.scope || "", subject, body]
+              // Conventional Commits parses a closing reference in its own
+              // paragraph as a footer rather than part of the body. Keep it
+              // in the rendered notes: consumers use these references for
+              // release-to-issue notifications.
+              const footer = (transformed.footer || commit.footer || "").trim();
+              const detail = [body, footer].filter(Boolean).join("\n\n");
+              const dedupeKey = [rawType, transformed.scope || commit.scope || "", subject, detail]
                 .join("\u0000");
               if (seenUserFacingChanges.has(dedupeKey)) {
                 return null;
@@ -268,8 +274,8 @@ module.exports = function createSemanticReleaseConfig(options = {}) {
               transformed.type = section;
 
               // Keep a concise user-facing commit body as a list continuation.
-              if (body) {
-                transformed.bodyIndented = body
+              if (detail) {
+                transformed.bodyIndented = detail
                   .split(/\r?\n/)
                   .map((line) => `  ${line}`)
                   .join("\n");
