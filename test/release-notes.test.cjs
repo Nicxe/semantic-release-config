@@ -7,6 +7,7 @@ async function generateNotes(commits) {
     assets: [{ path: "card.js" }],
     projectName: "F1 Sensor",
     repoSlug: "Nicxe/f1_sensor",
+    f1Theme: true,
     notifyIssues: false
   });
   const [, options] = config.plugins.find(
@@ -55,23 +56,29 @@ test("renders user-facing release notes without internal commit noise", async ()
     }
   ]);
 
-  assert.match(
-    notes,
-    /github\/downloads\/Nicxe\/f1_sensor\/v1\.1\.0-beta\.1\/total/
-  );
+  const downloadShield =
+    /github\/downloads\/Nicxe\/f1_sensor\/v1\.1\.0-beta\.1\/total/;
+  assert.match(notes, downloadShield);
   assert.match(notes, /This is a \*\*beta release\*\*/);
   assert.match(notes, /GitHub Sponsors/);
+  assert.match(notes, /🏎️ 🏁 🏎️ 🏁 🏎️ 🏁 🏎️ 🏁 🏎️ 🏁/);
+  assert.match(notes, /🏎️ 🏁 🏎️ 🏁 🏎️ 🏁 🏎️ 🏁 🏎️ 🏁\n\n---\n\n⚠️/);
   assert.match(notes, /Optional editorial summary/);
   assert.match(notes, /### New features/);
   assert.match(notes, /### Bug fixes/);
   assert.match(notes, /### Improvements/);
   assert.match(notes, /### Translations/);
-  assert.match(notes, /### Support F1 Sensor/);
+  assert.doesNotMatch(notes, /## \*\*F1 Sensor – v1\.1\.0-beta\.1\*\*/);
+  assert.doesNotMatch(notes, /^> ⭐/m);
+  assert.doesNotMatch(notes, /### Support F1 Sensor/);
   assert.match(notes, /\*\*Keep replay details visible\*\*/);
   assert.match(notes, /Keeps live timing connected through the finish\.\n  \n  Fixes #772\./);
   assert.doesNotMatch(notes, /\*\*\*\*Keep replay details visible\*\*\*\*/);
   assert.doesNotMatch(notes, /Update release tooling/);
   assert.doesNotMatch(notes, /Cover release-note generation/);
+  assert.ok(
+    notes.lastIndexOf("github/downloads/") > notes.lastIndexOf("Buy Me A Coffee")
+  );
   assert.equal(
     (notes.match(/Improve Swedish live data card labels/g) || []).length,
     1

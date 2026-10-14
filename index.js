@@ -87,6 +87,7 @@ function quoteSh(value) {
  * @param {Array<{path:string,label?:string,name?:string}>} [options.assets] - GitHub release assets
  * @param {string} [options.projectName] - used by the shared release-notes template
  * @param {string} [options.repoSlug] - "owner/repo" used by the shared release-notes template
+ * @param {boolean} [options.f1Theme=false] - add the F1 Sensor race banner to release notes
  * @param {string} [options.templatePath] - path to a repo-local template to use instead
  * @param {boolean} [options.draftRelease=true] - create draft GitHub releases
  * @param {boolean} [options.notifyIssues=true] - run shared notify-issues script on success
@@ -101,6 +102,7 @@ module.exports = function createSemanticReleaseConfig(options = {}) {
     assets,
     projectName,
     repoSlug,
+    f1Theme = false,
     templatePath,
     draftRelease = true,
     notifyIssues = true
@@ -214,6 +216,7 @@ module.exports = function createSemanticReleaseConfig(options = {}) {
                 repoSlug || process.env.GITHUB_REPOSITORY || "";
               context.componentName = componentName;
               context.zipName = resolvedZipName;
+              context.f1Theme = f1Theme;
 
               return context;
             },

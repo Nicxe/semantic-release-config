@@ -52,6 +52,10 @@ For a breaking change, use `feat(scope)!:` or `fix(scope)!:` and a final
 `BREAKING CHANGE:` footer. Use `feat(blueprint):` for a new or materially
 expanded blueprint instead of a custom `blue:` type.
 
+Pass `f1Theme: true` when generating F1 Sensor release notes to add its race
+banner above the beta notice. Other repositories keep the shared layout without
+the F1-specific decoration.
+
 ## License
 
 MIT
