@@ -63,7 +63,9 @@ test("renders user-facing release notes without internal commit noise", async ()
   assert.match(notes, /GitHub Sponsors/);
   assert.match(notes, /🏎️ 🏁 🏎️ 🏁 🏎️ 🏁 🏎️ 🏁 🏎️ 🏁/);
   assert.match(notes, /🏎️ 🏁 🏎️ 🏁 🏎️ 🏁 🏎️ 🏁 🏎️ 🏁\n\n---\n\n⚠️/);
+  assert.match(notes, /<!-- release-editorial:start -->/);
   assert.match(notes, /Optional editorial summary/);
+  assert.match(notes, /<!-- release-editorial:end -->/);
   assert.match(notes, /### New features/);
   assert.match(notes, /### Bug fixes/);
   assert.match(notes, /### Improvements/);

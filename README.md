@@ -56,6 +56,11 @@ Pass `f1Theme: true` when generating F1 Sensor release notes to add its race
 banner above the beta notice. Other repositories keep the shared layout without
 the F1-specific decoration.
 
+The template reserves a `release-editorial` HTML-comment block for consumers
+that collect an editorial introduction before a release is merged. The block is
+invisible in rendered Markdown and can safely be replaced or removed when a
+draft release is created.
+
 ## License
 
 MIT
