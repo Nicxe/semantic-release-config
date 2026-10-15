@@ -31,6 +31,19 @@ async function generateNotes(commits) {
   });
 }
 
+async function generateNotesWithContributors(contributors) {
+  const previous = process.env.RELEASE_CONTRIBUTORS;
+  process.env.RELEASE_CONTRIBUTORS = JSON.stringify(contributors);
+  try {
+    return await generateNotes([
+      { hash: "contributors", message: "feat(card): Add contributor credits" }
+    ]);
+  } finally {
+    if (previous === undefined) delete process.env.RELEASE_CONTRIBUTORS;
+    else process.env.RELEASE_CONTRIBUTORS = previous;
+  }
+}
+
 test("renders user-facing release notes without internal commit noise", async () => {
   const notes = await generateNotes([
     { hash: "1", message: "feat(card): Add timing comparison" },
@@ -84,5 +97,15 @@ test("renders user-facing release notes without internal commit noise", async ()
   assert.equal(
     (notes.match(/Improve Swedish live data card labels/g) || []).length,
     1
+  );
+});
+
+test("renders filtered authors and contributors when the release workflow provides them", async () => {
+  const notes = await generateNotesWithContributors(["alice", "bob"]);
+
+  assert.match(notes, /### Authors & contributors/);
+  assert.match(
+    notes,
+    /Thanks to \[@alice\]\(https:\/\/github\.com\/alice\) and \[@bob\]\(https:\/\/github\.com\/bob\) for contributing to this release\./
   );
 });

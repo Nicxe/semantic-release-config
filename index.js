@@ -48,6 +48,30 @@ function buildSectionOrderIndex(sectionOrder) {
   }, {});
 }
 
+function readContributors() {
+  const raw = process.env.RELEASE_CONTRIBUTORS;
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .filter((login) => typeof login === "string")
+      .map((login) => login.trim())
+      .filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
+function contributorsText(contributors) {
+  const mentions = contributors.map(
+    (login) => `[@${login}](https://github.com/${login})`
+  );
+  if (mentions.length < 2) return mentions.join("");
+  if (mentions.length === 2) return `${mentions[0]} and ${mentions[1]}`;
+  return `${mentions.slice(0, -1).join(", ")}, and ${mentions.at(-1)}`;
+}
+
 function readTemplate({ templatePath } = {}) {
   if (templatePath) {
     // Resolve relative to the consuming repo (semantic-release cwd).
@@ -217,6 +241,8 @@ module.exports = function createSemanticReleaseConfig(options = {}) {
               context.componentName = componentName;
               context.zipName = resolvedZipName;
               context.f1Theme = f1Theme;
+              context.contributors = readContributors();
+              context.contributorsText = contributorsText(context.contributors);
 
               return context;
             },
