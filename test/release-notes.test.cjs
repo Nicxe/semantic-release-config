@@ -87,7 +87,7 @@ test("renders user-facing release notes without internal commit noise", async ()
   assert.doesNotMatch(notes, /^> ⭐/m);
   assert.doesNotMatch(notes, /### Support F1 Sensor/);
   assert.match(notes, /\*\*Keep replay details visible\*\*/);
-  assert.match(notes, /Keeps live timing connected through the finish\.\n  \n  Fixes #772\./);
+  assert.match(notes, /Keeps live timing connected through the finish\. Fixes #772\./);
   assert.doesNotMatch(notes, /\*\*\*\*Keep replay details visible\*\*\*\*/);
   assert.doesNotMatch(notes, /Update release tooling/);
   assert.doesNotMatch(notes, /Cover release-note generation/);

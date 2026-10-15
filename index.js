@@ -291,7 +291,15 @@ module.exports = function createSemanticReleaseConfig(options = {}) {
               // in the rendered notes: consumers use these references for
               // release-to-issue notifications.
               const footer = (transformed.footer || commit.footer || "").trim();
-              const detail = [body, footer].filter(Boolean).join("\n\n");
+              // Keep closing issue references on the same paragraph as the
+              // user-facing explanation to avoid wasting vertical space.
+              const detail = [body, footer]
+                .filter(Boolean)
+                .join(" ")
+                .replace(
+                  /\s*\r?\n+\s*(?=(?:Fixes|Closes|Resolves)\s+#)/gi,
+                  " "
+                );
               const dedupeKey = [rawType, transformed.scope || commit.scope || "", subject, detail]
                 .join("\u0000");
               if (seenUserFacingChanges.has(dedupeKey)) {
