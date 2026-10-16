@@ -66,6 +66,11 @@ test("renders user-facing release notes without internal commit noise", async ()
     {
       hash: "8",
       message: "chore(translations): Improve Swedish live data card labels"
+    },
+    {
+      hash: "9",
+      message:
+        "chore(l10n): update Portuguese translation\n\nTranslation: F1 Sensor/Integration\nLanguage: Portuguese\nProgress: 57.3% (113 of 197 strings)\nTranslate-URL: https://hosted.weblate.org/projects/f1-sensor/integration/pt/"
     }
   ]);
 
@@ -83,6 +88,8 @@ test("renders user-facing release notes without internal commit noise", async ()
   assert.match(notes, /### Bug fixes/);
   assert.match(notes, /### Improvements/);
   assert.match(notes, /### Translations/);
+  assert.match(notes, /\*\*Update Portuguese translation\*\*/);
+  assert.match(notes, /Updated Portuguese translation through Weblate\./);
   assert.doesNotMatch(notes, /## \*\*F1 Sensor – v1\.1\.0-beta\.1\*\*/);
   assert.doesNotMatch(notes, /^> ⭐/m);
   assert.doesNotMatch(notes, /### Support F1 Sensor/);

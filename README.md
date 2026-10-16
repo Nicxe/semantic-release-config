@@ -44,7 +44,7 @@ resolved-issue reference such as `Fixes #123`.
 
 The template shows `feat`, `fix`, `perf`, legacy `blue`, and `docs` entries.
 It also shows only user-facing chores with one of these scopes:
-`translations`, `i18n`, `accessibility`, `a11y`, or `compatibility`. Internal
+`translations`, `i18n`, `l10n`, `accessibility`, `a11y`, or `compatibility`. Internal
 chores, refactors, tests, CI, build work, dependency maintenance, branch
 synchronization, release tooling, and formatting-only commits are omitted.
 

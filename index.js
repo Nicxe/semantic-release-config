@@ -23,6 +23,7 @@ const USER_FACING_CHORE_SCOPES = new Map([
   ["a11y", "Improvements"],
   ["compatibility", "Improvements"],
   ["i18n", "Translations"],
+  ["l10n", "Translations"],
   ["translations", "Translations"]
 ]);
 
@@ -39,6 +40,11 @@ function sectionForCommit(type, scope) {
   }
   return DEFAULT_RELEASE_NOTE_TYPES.find((entry) => entry.type === normalizedType)
     ?.section;
+}
+
+function translationLanguage(body) {
+  const match = String(body || "").match(/^Language:\s*(.+)$/im);
+  return match?.[1]?.trim() || "";
 }
 
 function buildSectionOrderIndex(sectionOrder) {
@@ -293,21 +299,30 @@ module.exports = function createSemanticReleaseConfig(options = {}) {
               const footer = (transformed.footer || commit.footer || "").trim();
               // Keep closing issue references on the same paragraph as the
               // user-facing explanation to avoid wasting vertical space.
-              const detail = [body, footer]
+              let detail = [body, footer]
                 .filter(Boolean)
                 .join(" ")
                 .replace(
                   /\s*\r?\n+\s*(?=(?:Fixes|Closes|Resolves)\s+#)/gi,
                   " "
                 );
-              const dedupeKey = [rawType, transformed.scope || commit.scope || "", subject, detail]
+              const scope = String(transformed.scope || commit.scope || "").toLowerCase();
+              let displaySubject = subject;
+              if (rawType === "chore" && scope === "l10n") {
+                const language = translationLanguage(body);
+                if (language) {
+                  displaySubject = `Update ${language} translation`;
+                  detail = `Updated ${language} translation through Weblate.`;
+                }
+              }
+              const dedupeKey = [rawType, transformed.scope || commit.scope || "", displaySubject, detail]
                 .join("\u0000");
               if (seenUserFacingChanges.has(dedupeKey)) {
                 return null;
               }
               seenUserFacingChanges.add(dedupeKey);
 
-              transformed.subject = subject;
+              transformed.subject = displaySubject;
               transformed.type = section;
 
               // Keep a concise user-facing commit body as a list continuation.
